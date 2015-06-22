@@ -35,7 +35,12 @@ $(document).ready( function () {
     counterView.$el.on("click","#btn2", function () {
         var mod = counterView.model;
         var currVal = mod.get("value");
-        mod.set("value",currVal-1);
+        //mod.set("value")
+          if (currVal === 0) {
+            return 
+          } else {
+            mod.set("value",currVal-1);
+            }
     });
 
     counterView.$el.on("click","#clr", function () {
