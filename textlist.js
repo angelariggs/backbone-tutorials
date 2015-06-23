@@ -2,25 +2,43 @@
 $(document).ready( function () {
 
     var TextModel = Backbone.Model.extend({
-        defaults: {"num" : 0, "value" : ""},
-        replace : function (str) {
-          this.set("value", str);
-          var currVal = this.get("num");
-          this.set("num", currVal+1)
+      defaults: {"num" : 0, "value" : "", "lastVal" : ""},
+      replace : function (str) {
+        this.set("value", str);
+        var currVal = this.get("num");
+        var currText = this.get("value");
+        if (currText !== this.get("lastVal")) {
+          this.set("num", currVal+1);
         }
-
+      }
     });
 
+    function useMustacheTemplates() {
+              _.templateSettings = {
+                  interpolate: /\{\{(.+?)\}\}/g
+              };
+          }
+    useMustacheTemplates();
     var TextView = Backbone.View.extend({
+
+        template: _.template('{{textVal}} <br><div> <input type="text" value="{{textVal}}" /> <button id="clr">Clear</button> </div><p> {{counter}} </p>'),
+
         render: function () {
-            var counter = this.model.get("num");
-            var textVal = this.model.get("value");
-            var btn = '<button id="clr">Clear</button>';
-            var input = '<input type="text" value="' + textVal + '" />';
-            this.$el.html(textVal + "<br><div>" + input + btn + "</div" + "<p>" + counter + "</p>")
+          var data = {counter:this.model.get("num"),
+                      textVal:this.model.get("value")};
+
+            //var counter = this.model.get("num");
+            //var textVal = this.model.get("value");
+            //var btn = '<button id="clr">Clear</button>';
+            //var input = '<input type="text" value="' + textVal + '" />';
+            //this.$el.html(textVal + "<br><div>" + input + btn + "</div" + "<p>" + counter + "</p>")
+
+            this.$el.html(this.template(data));
+            // $(document.body).append(this.$el);
         },
         initialize: function () {
-            this.model.on("change", this.render, this);
+          this.model.on("change", this.render, this);
+
             // last argument 'this' ensures that render's
             // 'this' means the view, not the model
         },
@@ -29,10 +47,12 @@ $(document).ready( function () {
             "keypress input" : "updateOnEnter"
         },
         replace : function () {
+
             var str = this.$el.find("input").val();
             this.model.replace(str);
         },
         clear: function () {
+            this.model.set("lastVal", this.model.get("value"));
             this.model.replace("");
         },
         updateOnEnter: function (e){
