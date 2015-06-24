@@ -10,15 +10,16 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(__dirname));
 
-app.get('/counter/1', function (req, res) {
+app.get('/counter/1', function (request, response) {
     console.log("counter has been requested");
-    res.send(JSON.stringify({value : counter1}));
+    response.send(JSON.stringify({value : counter1}));
 });
 
-app.put('/counter/1', function (req, res) {
-    console.log(req.body);
-    counter1 = req.body.value;
-    res.end();
+app.put('/counter/1', function (request, response) {
+    console.log(request.body);
+    counter1 = request.body.value;
+    var json = JSON.stringify({});
+    response.end(json);
 });
 
 app.listen(3000, function () {
